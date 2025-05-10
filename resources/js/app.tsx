@@ -9,7 +9,23 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
+    resolve: async (name) => {
+        try {
+            return await resolvePageComponent(
+                `./pages/admin/${name}.tsx`,
+                import.meta.glob('./pages/admin/**/*.tsx')
+            );
+        } catch (error) {
+            try {
+                return await resolvePageComponent(
+                    `./pages/website/${name}.tsx`,
+                    import.meta.glob('./pages/website/**/*.tsx')
+                );
+            } catch (secondError) {
+                console.error(`Page component "${name}" not found in any directory`)
+            }
+        }
+    },
     setup({ el, App, props }) {
         const root = createRoot(el);
 

@@ -1,6 +1,6 @@
-import Heading from '@/components/core/heading';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import Heading from '@/components/admin/core/heading';
+import { Button } from '@/components/common/button';
+import { Separator } from '@/components/common/separator';
 import { cn } from '@/lib/utils';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
