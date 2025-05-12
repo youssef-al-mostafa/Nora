@@ -10,12 +10,6 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    /**
-     * Create a new admin user
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function createAdmin(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -37,5 +31,14 @@ class UserController extends Controller
             'message' => 'Admin created successfully',
             'data' => $user->only(['id', 'name', 'email', 'created_at'])
         ], 201);
+    }
+    public function getAdmins(): JsonResponse
+    {
+        $admins = User::role('admin')->get(['id', 'name', 'email', 'created_at']);
+
+        return response()->json([
+            'success' => true,
+            'data' => $admins
+        ]);
     }
 }

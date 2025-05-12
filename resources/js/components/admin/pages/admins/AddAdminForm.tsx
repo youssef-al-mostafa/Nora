@@ -62,35 +62,22 @@ export const AdminsForm = () => {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             setIsSubmitting(true);
-
-            // Extract the data we need to send to the API
-
-
             const { passwordConfirmation, ...formData } = values;
-
-            // Make API request
-            const response = await axios.post('/api/admins', formData, {
+            const response = await axios.post('/admin/create', formData, {
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 }
             });
-
-            // Show success notification
             toast.success("Admin created successfully");
-
-            // Reset form
             form.reset();
 
         } catch (error) {
-            // Handle errors from the API
             if (axios.isAxiosError(error) && error.response) {
-                // Laravel validation errors
                 const serverErrors = error.response.data.errors;
 
                 if (serverErrors) {
-                    // Map server errors to form fields
                     Object.entries(serverErrors).forEach(([key, messages]) => {
                         form.setError(key as any, {
                             type: 'server',
