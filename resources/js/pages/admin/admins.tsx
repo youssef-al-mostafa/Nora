@@ -15,7 +15,8 @@ export default function Admins() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admins" />
-            <AdminsForm />
+            {/* <AdminsForm /> */}
+            <AdminsTable />
         </AppLayout>
     );
 }
