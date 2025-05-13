@@ -1,11 +1,12 @@
 <?php
 
+use App\Http\Controllers\WebsiteController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('home/home');
-})->name('home');
+Route::get('/', [WebsiteController::class, 'home'])->name('website.home');
+
+Route::get('/content/{ref}', [WebsiteController::class, 'show']);
 
 
 require __DIR__.'/auth.php';

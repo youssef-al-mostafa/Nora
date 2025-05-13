@@ -42,7 +42,7 @@ export interface User {
     [key: string]: unknown; // This allows for additional properties...
 }
 
-interface Admin {
+export interface Admin {
     id: number;
     name: string;
     email: string;
@@ -51,4 +51,11 @@ interface Admin {
     updated_at: string;
 }
 
-
+export interface ContentItem {
+    id: number;
+    ref: string;
+    status: string;
+    attrs: Record<string, any>;
+    created_at: string;
+    updated_at: string;
+  }
