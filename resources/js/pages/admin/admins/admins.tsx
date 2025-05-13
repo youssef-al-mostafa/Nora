@@ -1,8 +1,7 @@
-import { AdminsForm } from '@/components/admin/pages/admins/AddAdminForm';
-import { AdminsTable } from '@/components/admin/pages/admins/AdminsTable';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
+import { AdminsTable } from './AdminsTable';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

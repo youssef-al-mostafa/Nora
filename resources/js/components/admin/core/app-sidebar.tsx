@@ -4,7 +4,7 @@ import { NavUser } from '@/components/admin/core/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/admin/core/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, Users } from 'lucide-react';
+import { GalleryVerticalEnd, LayoutGrid, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -18,6 +18,11 @@ const mainNavItems: NavItem[] = [
         href: '/admins',
         icon: Users,
     },
+    {
+        title: 'Pages',
+        href: '/pages',
+        icon: GalleryVerticalEnd,
+    }
 ];
 
 const footerNavItems: NavItem[] = [
