@@ -1,6 +1,6 @@
 import  Footer  from '@/components/website/navigation/Footer';
 import  NavBar  from '@/components/website/navigation/NavBar';
-import  Banner  from '@/components/website/pages/home/Banner';
+import  Banner  from '@/pages/website/home/Banner';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 
