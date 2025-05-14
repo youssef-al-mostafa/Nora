@@ -6,7 +6,7 @@ import { Button } from '@/components/common/button';
 import { Separator } from '@/components/common/separator';
 import { Link } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
-import { FormEventHandler, useEffect } from 'react';
+import { FormEventHandler, useEffect, useState } from 'react';
 
 const getPageNameFromPath = () => {
     const path = window.location.pathname;
@@ -54,15 +54,25 @@ const Home = ({ initialContent }: { initialContent: any }) => {
     });
 
     useEffect(() => {
+        console.log("Initial content received:", initialContent);
+
         if (initialContent && initialContent[`page.${pageName}`]) {
             const existingContent = initialContent[`page.${pageName}`];
-            setData(prevData => ({
-                ref: `page.${pageName}`,
-                attrs: {
-                    ...prevData.attrs,
-                    ...existingContent.attrs
-                }
-            }));
+            console.log("Existing content for this page:", existingContent);
+
+            setData(prevData => {
+                const newData = {
+                    ref: `page.${pageName}`,
+                    attrs: {
+                        ...prevData.attrs,
+                        ...existingContent.attrs
+                    }
+                };
+                console.log("Setting form data to:", newData);
+                return newData;
+            });
+        } else {
+            console.log("No existing content found for this page");
         }
     }, [initialContent, pageName]);
 
@@ -114,7 +124,7 @@ const Home = ({ initialContent }: { initialContent: any }) => {
                                 id="bannerText"
                                 type="text"
                                 className="p-2 border rounded"
-                                value={data.attrs.bannerText || ''}
+                                value={data.attrs.bannerText ?? ''}
                                 onChange={(e) => setData('attrs', {
                                     ...data.attrs,
                                     bannerText: e.target.value

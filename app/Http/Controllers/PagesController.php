@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Content;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -9,10 +10,13 @@ use Inertia\Response;
 
 class PagesController extends Controller
 {
-    public function home(Request $request): Response
+    public function home(): Response
     {
+        $homeContent = Content::where('ref', 'page.home')->first();
         return Inertia::render('content/home', [
-            'status' => $request->session()->get('status'),
+            'initialContent' => [
+                'page.home' => $homeContent,
+            ]
         ]);
     }
     public function about(Request $request): Response
