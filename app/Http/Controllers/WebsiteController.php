@@ -20,14 +20,12 @@ class WebsiteController extends Controller
         ]);
     }
 
-    public function about(): Response
+    public function about()
     {
-        return Inertia::render('content/pages');
-    }
-
-    public function contact(): Response
-    {
-        return Inertia::render('content/pages');
+        $pageContent = \App\Models\Content::where('ref', 'page.about')->first();
+        return inertia('website/about', [
+            'content' => $pageContent ? $pageContent->attrs : null
+        ]);
     }
 
     public function show($ref)
@@ -35,5 +33,4 @@ class WebsiteController extends Controller
         $content = Content::where('ref', $ref)->first();
         return response()->json($content);
     }
-
 }
