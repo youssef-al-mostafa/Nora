@@ -5,8 +5,11 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('/admin/create', [UserController::class, 'createAdmin']);
+    Route::post('/admin/add', [UserController::class, 'addAdmin'])
+        ->name('admin.add');
     Route::get('/admin/all', [UserController::class, 'getAdmins']);
+    Route::get('/admin/create', [UserController::class, 'createAdmin'])
+        ->name('admin.create');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -17,8 +20,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('admins', function () {
         return Inertia::render('admins/admins');
     })->name('admin.admins');
-
 });
 
-require __DIR__.'/pages.php';
-require __DIR__.'/settings.php';
+require __DIR__ . '/pages.php';
+require __DIR__ . '/settings.php';

@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export function formatDate(dateString: string | null | undefined, fallbackText: string = 'Invalid date'): string {
+export function formatDate(dateString: string | null | undefined, fallbackText: string = ''): string {
     if (!dateString) {
       return fallbackText;
     }
@@ -29,4 +29,4 @@ export function formatDate(dateString: string | null | undefined, fallbackText: 
       console.error('Error formatting date:', error);
       return fallbackText;
     }
-  }
+}

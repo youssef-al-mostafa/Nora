@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -5,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -62,8 +62,9 @@ export const AdminsForm = () => {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             setIsSubmitting(true);
+            const url = route('admin.add');
             const { passwordConfirmation, ...formData } = values;
-            const response = await axios.post('/admin/create', formData, {
+            const response = await axios.post(url, formData, {
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
                     'Content-Type': 'application/json',
@@ -79,7 +80,7 @@ export const AdminsForm = () => {
 
                 if (serverErrors) {
                     Object.entries(serverErrors).forEach(([key, messages]) => {
-                        form.setError(key as any, {
+                        form.setError(key as never, {
                             type: 'server',
                             message: Array.isArray(messages) ? messages[0] : messages as string
                         });
