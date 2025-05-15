@@ -4,7 +4,7 @@ use App\Http\Controllers\WebsiteController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', [WebsiteController::class, 'home'])->name('website.home');
+Route::get('/', [WebsiteController::class, 'home'])->name('home');
 
 Route::get('/about', [WebsiteController::class, 'about'])->name('website.about');
 

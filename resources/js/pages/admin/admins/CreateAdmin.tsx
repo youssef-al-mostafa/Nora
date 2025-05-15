@@ -18,6 +18,7 @@ import axios from "axios";
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import { ArrowLeft } from "lucide-react"
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -110,65 +111,76 @@ export default function CreateAdmin() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admins" />
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-fit mx-auto">
-                    <div className="flex gap-6">
-                        <FormField
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Admin Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Admin Email</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    <div className="flex gap-6">
-                        <FormField
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Password</FormLabel>
-                                    <FormControl>
-                                        <Input type="password" placeholder="" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            name="passwordConfirmation"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Password Confirmation</FormLabel>
-                                    <FormControl>
-                                        <Input type="password" placeholder="" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    <div className="flex justify-center">
-                        <Button type="submit" className="mx-auto">Add Admin</Button>
-                    </div>
-                </form>
-            </Form>
+            <div className="p-4">
+                <Link href={route('admin.admins')}
+                      className="btn btn-primary h-fit py-1
+                      w-fit rounded-lg">
+                    <ArrowLeft />
+                    Back to Admins
+                </Link>
+                <div className="flex items-center justify-center mt-7 mb-9">
+                    <h1 className="text-3xl font-extrabold">Create Admin</h1>
+                </div>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-fit mx-auto">
+                        <div className="flex flex-col gap-6">
+                            <FormField
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem className="w-96">
+                                        <FormLabel>Admin Name</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Admin Email</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="flex flex-col gap-6">
+                            <FormField
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Password</FormLabel>
+                                        <FormControl>
+                                            <Input type="password" placeholder="" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                name="passwordConfirmation"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Password Confirmation</FormLabel>
+                                        <FormControl>
+                                            <Input type="password" placeholder="" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="flex justify-center">
+                            <Button type="submit" className="mx-auto">Add Admin</Button>
+                        </div>
+                    </form>
+                </Form>
+            </div>
         </AppLayout>
     )
 }

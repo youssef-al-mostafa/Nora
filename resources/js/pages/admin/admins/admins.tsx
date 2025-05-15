@@ -16,19 +16,20 @@ export default function Admins() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admins" />
-
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-semibold">
-                    Admin Management
-                </h1>
-                <Button asChild>
-                    <Link href={route('admin.create')}>
-                        <PlusCircle className="h-4 w-4 mr-2" />
-                        <span>Create Admin</span>
-                    </Link>
-                </Button>
+            <div className='p-4'>
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-semibold">
+                        Admin Management
+                    </h1>
+                    <Button asChild>
+                        <Link href={route('admin.create')}>
+                            <PlusCircle className="h-4 w-4 mr-2" />
+                            <span>Create Admin</span>
+                        </Link>
+                    </Button>
+                </div>
+                <AdminsTable />
             </div>
-            <AdminsTable />
         </AppLayout>
     );
 }
