@@ -6,7 +6,7 @@ import Banner from '@/pages/website/home/Banner';
 import Footer from '@/components/website/navigation/Footer';
 
 export default function Home() {
-  const { initialContent } = usePage().props as any;
+  const { initialContent } = usePage().props as never;
 
   useEffect(() => {
     if (initialContent) {

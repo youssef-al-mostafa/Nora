@@ -16,12 +16,14 @@ class CreateContentFrontRoute extends Command
 
     protected $files;
 
-    public function __construct(Filesystem $files) {
+    public function __construct(Filesystem $files)
+    {
         parent::__construct();
         $this->files = $files;
     }
 
-    public function handle() {
+    public function handle()
+    {
         $page = $this->argument('page');
         $controller = $this->option('controller');
         $routePrefix = $this->option('route-prefix');
@@ -34,7 +36,8 @@ class CreateContentFrontRoute extends Command
         return Command::SUCCESS;
     }
 
-    protected function addRoute($page, $controller, $routePrefix) {
+    protected function addRoute($page, $controller, $routePrefix)
+    {
         $routesPath = base_path('routes/web.php');
         $routeContent = $this->files->get($routesPath);
 
@@ -67,7 +70,8 @@ class CreateContentFrontRoute extends Command
         $this->info("Route added for '{$page}'");
     }
 
-    protected function findLastRouteIndex(array $lines) {
+    protected function findLastRouteIndex(array $lines)
+    {
         $lastRouteIndex = 0;
         foreach ($lines as $index => $line) {
             if (Str::contains($line, 'Route::')) {
@@ -78,7 +82,8 @@ class CreateContentFrontRoute extends Command
         return $lastRouteIndex;
     }
 
-    protected function addControllerMethod($page, $controller) {
+    protected function addControllerMethod($page, $controller)
+    {
         $controllerPath = app_path('Http/Controllers/' . $controller . '.php');
 
         if (!$this->files->exists($controllerPath)) {
@@ -99,7 +104,7 @@ class CreateContentFrontRoute extends Command
 
             $methodDefinition = <<<EOT
                 public function {$page}() {
-                    \$pageContent = \App\Models\Content::where('ref', 'page.{$page}')->first();
+                    \$pageContent = Content::where('ref', 'page.{$page}')->first();
                     return inertia('website/{$page}', [
                       'content' => \$pageContent ? \$pageContent->attrs : null
                     ]);

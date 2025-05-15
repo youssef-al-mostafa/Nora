@@ -22,12 +22,11 @@ class WebsiteController extends Controller
 
     public function about()
     {
-        $pageContent = \App\Models\Content::where('ref', 'page.about')->first();
-        return inertia('website/about', [
+        $pageContent = Content::where('ref', 'page.about')->first();
+        return inertia('about/page', [
             'content' => $pageContent ? $pageContent->attrs : null
         ]);
     }
-
     public function show($ref)
     {
         $content = Content::where('ref', $ref)->first();

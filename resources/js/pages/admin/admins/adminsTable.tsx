@@ -5,9 +5,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Admin } from '@/types';
 import { formatDate } from '@/lib/utils';
-import { Lock } from 'lucide-react';
 import DeleteUserTable from '@/components/admin/core/delete-user-table';
-import { EditAdmin } from '@/components/admin/core/edit-admin';
 import { ChangeAdminPassword } from '@/components/admin/core/change-admin-password';
 
 

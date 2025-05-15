@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
@@ -6,13 +7,9 @@ import { Button } from '@/components/common/button';
 import { Separator } from '@/components/common/separator';
 import { Link } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
-import { FormEventHandler, useEffect, useState } from 'react';
+import { FormEventHandler, useEffect } from 'react';
 
-const getPageNameFromPath = () => {
-    const path = window.location.pathname;
-    const segments = path.split('/');
-    return segments[segments.length - 1];
-};
+
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -25,19 +22,18 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Home',
         href: '/pages/home',
-        icon: null,
     },
-    {
-        title: 'About us',
+        {
+        title: 'About',
         href: '/pages/about',
-        icon: null,
-    },
-    {
-        title: 'Contact us',
-        href: '/pages/contact',
-        icon: null,
     },
 ];
+
+const getPageNameFromPath = () => {
+    const path = window.location.pathname;
+    const segments = path.split('/');
+    return segments[segments.length - 1];
+};
 
 const Home = ({ initialContent }: { initialContent: any }) => {
     const currentPath = window.location.pathname;
@@ -74,7 +70,7 @@ const Home = ({ initialContent }: { initialContent: any }) => {
         } else {
             console.log("No existing content found for this page");
         }
-    }, [initialContent, pageName]);
+    }, [initialContent, pageName, setData]);
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -112,7 +108,7 @@ const Home = ({ initialContent }: { initialContent: any }) => {
                 </aside>
                 <Separator className="my-6 md:hidden" />
 
-                <div className="flex-1 md:max-w-2xl">
+                <div className="flex-1 md:max-w-2xl pt-4">
                     <h2 className="text-2xl font-bold mb-6">{pageName.charAt(0).toUpperCase() + pageName.slice(1)} Content</h2>
 
                     <form onSubmit={handleSubmit} className="space-y-6">

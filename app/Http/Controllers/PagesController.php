@@ -21,16 +21,15 @@ class PagesController extends Controller
     }
     public function about(Request $request): Response
     {
-        return Inertia::render('content/pages', [
-            'status' => $request->session()->get('status'),
+        $aboutContent = Content::where('ref', 'page.about')->first();
+        return Inertia::render('content/about', [
+            'initialContent' => [
+                'page.about' => $aboutContent,
+            ]
         ]);
     }
-    public function contact(Request $request): Response
-    {
-        return Inertia::render('content/pages', [
-            'status' => $request->session()->get('status'),
-        ]);
-    }
+
+
     public function update(Request $request)
     {
         $validated = $request->validate([
@@ -39,7 +38,7 @@ class PagesController extends Controller
         ]);
 
         try {
-            $content = \App\Models\Content::updateOrCreate(
+            $content = Content::updateOrCreate(
                 ['ref' => $validated['ref']],
                 [
                     'attrs' => $validated['attrs'],

@@ -18,17 +18,6 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Home',
         href: '/pages/home',
-        icon: null,
-    },
-    {
-        title: 'About us',
-        href: '/pages/about',
-        icon: null,
-    },
-    {
-        title: 'Contact us',
-        href: '/pages/contact',
-        icon: null,
     },
 ];
 const Pages = () => {
@@ -58,12 +47,8 @@ const Pages = () => {
                         ))}
                     </nav>
                 </aside>
-
                 <Separator className="my-6 md:hidden" />
-{/*
-                <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-12">{children}</section>
-                </div> */}
+
             </div>
         </AppLayout>
     );

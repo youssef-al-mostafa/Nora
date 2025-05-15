@@ -53,7 +53,6 @@ class CreateContentFront extends Command
 
         $this->files->put($pageFilePath, $componentContent);
         $this->info("Created page component: {$pageFilePath}");
-
     }
 
     protected function generatePageComponentContent($page, $basePath)
@@ -70,12 +69,12 @@ class CreateContentFront extends Command
         return <<<EOT
 import { Head, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
-import { contentService } from '{$relativePath}../services/ContentSevice';
+import { contentService } from '@/services/ContentSevice';
 import NavBar from '@/components/website/navigation/NavBar';
 import Footer from '@/components/website/navigation/Footer';
 
 export default function {$pascalCasePage}() {
-  const { content } = usePage().props as any;
+  const { content } = usePage().props as never;
 
   useEffect(() => {
     if (content) {
@@ -87,12 +86,11 @@ export default function {$pascalCasePage}() {
     <>
       <Head title="{$titleCasePage}" />
       <NavBar />
-
+       <div className="h-100"></div>
       <Footer />
     </>
   );
 }
 EOT;
     }
-
 }
