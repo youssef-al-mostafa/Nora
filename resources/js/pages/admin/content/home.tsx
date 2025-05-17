@@ -2,30 +2,18 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { type NavItem } from '@/types';
 import { Button } from '@/components/common/button';
 import { Separator } from '@/components/common/separator';
 import { Link } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
-import { FormEventHandler, useEffect } from 'react';
-
-
+import { FormEventHandler, useEffect, useState } from 'react';
+import { contentSidebarNavItems } from '@/config/adminNavigation';
+import { NavItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Home - dashboard',
         href: '/pages/home',
-    },
-];
-
-const sidebarNavItems: NavItem[] = [
-    {
-        title: 'Home',
-        href: '/pages/home',
-    },
-        {
-        title: 'About',
-        href: '/pages/about',
     },
 ];
 
@@ -38,6 +26,7 @@ const getPageNameFromPath = () => {
 const Home = ({ initialContent }: { initialContent: any }) => {
     const currentPath = window.location.pathname;
     const pageName = getPageNameFromPath();
+    const [navItems, setNavItems] = useState<NavItem[]>(contentSidebarNavItems);
 
     const { data, setData, patch, processing, errors } = useForm({
         ref: `page.${pageName}`,
@@ -48,6 +37,13 @@ const Home = ({ initialContent }: { initialContent: any }) => {
             featuredSection: ''
         },
     });
+
+    useEffect(() => {
+        setNavItems(contentSidebarNavItems.map(item => ({
+            ...item,
+            isActive: item.href === currentPath
+        })));
+    }, [currentPath]);
 
     useEffect(() => {
         console.log("Initial content received:", initialContent);
@@ -89,14 +85,14 @@ const Home = ({ initialContent }: { initialContent: any }) => {
             <div className="flex flex-col space-y-8 lg:flex-row lg:space-y-0 lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">
                     <nav className="flex flex-col space-y-1 space-x-0">
-                        {sidebarNavItems.map((item, index) => (
+                        {navItems.map((item, index) => (
                             <Button
                                 key={`${item.href}-${index}`}
                                 size="sm"
                                 variant="ghost"
                                 asChild
                                 className={cn('w-full justify-start', {
-                                    'bg-muted': currentPath === item.href,
+                                    'bg-muted': item.isActive || currentPath === item.href,
                                 })}
                             >
                                 <Link href={item.href} prefetch>

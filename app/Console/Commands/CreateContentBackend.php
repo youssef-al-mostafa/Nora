@@ -10,10 +10,10 @@ class CreateContentBackend extends Command
 {
     protected $signature = 'content:create-backend {page : The page name}
                            {--title= : The display title for the page (defaults to capitalized page name)}
-                           {--base-nav-file=resources/js/pages/admin/content/home.tsx : Base file to extract nav items from}
-                           {--template-file=resources/js/pages/template.tsx : Template file to use for new page}
-                           {--output-dir=resources/js/pages/admin/content : Directory to create the new page in}';
-    protected $description = 'Create backend admin content page with sidebar navigation';
+                           {--template-file=resources/js/pages/admin/content/home.tsx : Template file to use as base}
+                           {--nav-config=resources/js/config/adminNavigation.ts : Navigation configuration file}
+                           {--single-field : Create with only one content field instead of multiple fields}';
+    protected $description = 'Create backend admin content page with navigation and content form';
     protected $files;
 
     public function __construct(Filesystem $files)
@@ -26,124 +26,216 @@ class CreateContentBackend extends Command
     {
         $page = $this->argument('page');
         $title = $this->option('title') ?: Str::headline($page);
-        $baseNavFile = $this->option('base-nav-file');
         $templateFile = $this->option('template-file');
-        $outputDir = $this->option('output-dir');
+        $navConfigFile = $this->option('nav-config');
+        $singleField = $this->option('single-field');
 
-        $this->updateNavigation($baseNavFile, $page, $title);
+        $outputDir = dirname($templateFile);
+        $outputFile = "{$outputDir}/{$page}.tsx";
 
-        $this->createContentPage($templateFile, $outputDir, $page, $title);
+        if (!$this->files->exists($templateFile)) {
+            $this->error("Template file '{$templateFile}' does not exist.");
+            return Command::FAILURE;
+        }
 
-        $this->info("Backend content admin page '{$page}' has been created successfully!");
+        if (!$this->files->exists($navConfigFile)) {
+            $this->createNavigationConfig($navConfigFile);
+        }
+
+        if ($this->files->exists($outputFile)) {
+            if (!$this->confirm("File '{$outputFile}' already exists. Do you want to overwrite it?", false)) {
+                $this->info('Operation cancelled.');
+                return Command::SUCCESS;
+            }
+        }
+
+        $this->updateNavigationConfig($navConfigFile, $page, $title);
+
+        $this->createContentPage($templateFile, $outputFile, $page, $title, $singleField);
+
+        $this->info("Backend content admin page '{$page}' has been created successfully at {$outputFile}!");
 
         return Command::SUCCESS;
     }
 
-    protected function updateNavigation($baseNavFile, $page, $title)
+    protected function createNavigationConfig($navConfigFile)
     {
-        if (!$this->files->exists($baseNavFile)) {
-            $this->error("Base navigation file '{$baseNavFile}' does not exist.");
+        $this->info("Creating navigation configuration file at '{$navConfigFile}'...");
+
+        $directory = dirname($navConfigFile);
+        if (!$this->files->isDirectory($directory)) {
+            $this->files->makeDirectory($directory, 0755, true);
+        }
+
+        $navConfigContent = <<<EOT
+// File: resources/js/config/adminNavigation.ts
+
+import { NavItem } from '@/types';
+
+/**
+ * Content management sidebar navigation
+ * Centralized navigation items for content management pages
+ */
+export const contentSidebarNavItems: NavItem[] = [
+    {
+        title: 'Home',
+        href: '/pages/home',
+    },
+];
+
+/**
+ * Helper to get the active state of navigation items
+ * @param items - Navigation items to process
+ * @param currentPath - Current path to compare against
+ * @returns Navigation items with isActive property set
+ */
+export function getActiveNavItems(items: NavItem[], currentPath: string): NavItem[] {
+    return items.map(item => ({
+        ...item,
+        isActive: item.href === currentPath,
+    }));
+}
+EOT;
+
+        $this->files->put($navConfigFile, $navConfigContent);
+        $this->info("Created navigation configuration file.");
+    }
+
+    protected function updateNavigationConfig($navConfigFile, $page, $title)
+    {
+        $configContent = $this->files->get($navConfigFile);
+
+        if (Str::contains($configContent, "href: '/pages/{$page}'")) {
+            $this->warn("Navigation item for '{$page}' already exists in the config.");
             return;
         }
 
-        $content = $this->files->get($baseNavFile);
-
-        if (!preg_match('/const\s+sidebarNavItems\s*:\s*NavItem\[\]\s*=\s*\[(.*?)\];/s', $content, $matches)) {
-            $this->error("Could not find sidebarNavItems array in base navigation file.");
-            return;
-        }
-
-        $navItemsBlock = $matches[1];
-        $newNavItem = <<<EOT
+        if (preg_match('/export const contentSidebarNavItems: NavItem\[\] = \[(.*?)\];/s', $configContent, $matches)) {
+            $navItemsBlock = $matches[1];
+            $newNavItem = <<<EOT
     {
         title: '{$title}',
         href: '/pages/{$page}',
     },
 EOT;
 
-        if (Str::contains($navItemsBlock, "href: '/pages/{$page}'")) {
-            $this->warn("Navigation item for '{$page}' already exists in base file.");
-        } else {
-            if (preg_match('/},$/', $navItemsBlock, $lastItem, PREG_OFFSET_CAPTURE)) {
-                $lastItemPosition = $lastItem[0][1] + 2;
+            if (preg_match('/},\s*$/m', $navItemsBlock, $lastItem, PREG_OFFSET_CAPTURE)) {
+                $lastItemEndPosition = $lastItem[0][1] + strlen($lastItem[0][0]);
+                $insertPosition = $matches[0][1] + $lastItemEndPosition - strlen($matches[1]);
 
-                $updatedNavItems = substr_replace(
-                    $navItemsBlock,
-                    "\n    " . $newNavItem,
-                    $lastItemPosition,
-                    0
+                $updatedConfig = substr_replace(
+                    $configContent,
+                    $navItemsBlock . "\n    " . $newNavItem,
+                    $matches[0][1] + strlen('export const contentSidebarNavItems: NavItem[] = ['),
+                    strlen($navItemsBlock)
                 );
 
-                $updatedContent = str_replace($navItemsBlock, $updatedNavItems, $content);
-                $this->files->put($baseNavFile, $updatedContent);
-
-                $this->info("Navigation item added for '{$page}' in base file.");
+                $this->files->put($navConfigFile, $updatedConfig);
+                $this->info("Added navigation item for '{$page}' in the navigation config.");
             } else {
-                $this->error("Could not find suitable position to insert navigation item.");
+                $updatedConfig = str_replace(
+                    'export const contentSidebarNavItems: NavItem[] = [',
+                    "export const contentSidebarNavItems: NavItem[] = [\n    " . $newNavItem,
+                    $configContent
+                );
+
+                $this->files->put($navConfigFile, $updatedConfig);
+                $this->info("Added navigation item for '{$page}' in the navigation config.");
             }
+        } else {
+            $this->error("Could not find contentSidebarNavItems array in the config file.");
         }
     }
 
-    protected function createContentPage($templateFile, $outputDir, $page, $title)
+    protected function createContentPage($templateFile, $outputFile, $page, $title, $singleField)
     {
-        if (!$this->files->exists($templateFile)) {
-            $this->error("Template file '{$templateFile}' does not exist.");
-            return;
-        }
+        $content = $this->files->get($templateFile);
 
-        if (!$this->files->isDirectory($outputDir)) {
-            $this->files->makeDirectory($outputDir, 0755, true);
-        }
-
-        $outputFile = "{$outputDir}/{$page}.tsx";
-
-        if ($this->files->exists($outputFile)) {
-            $this->warn("Content page file '{$outputFile}' already exists.");
-            if (!$this->confirm('Do you want to overwrite it?', false)) {
-                return;
-            }
-        }
-
-        $templateContent = $this->files->get($templateFile);
-
-        $templateContent = preg_replace(
-            '/(title: \'[^\']*\')/',
-            "title: '{$title}'",
-            $templateContent
-        );
-
-        $templateContent = preg_replace(
-            '/const Pages = \(\) => {/',
-            "const " . Str::studly($page) . " = () => {",
-            $templateContent
-        );
-
-        $templateContent = preg_replace(
-            '/export default Pages;/',
-            "export default " . Str::studly($page) . ";",
-            $templateContent
-        );
-
-        $templateContent = preg_replace(
-            '/<Head title="[^"]*" \/>/',
-            "<Head title=\"{$title}\" />",
-            $templateContent
-        );
-
-        $baseNavFile = $this->option('base-nav-file');
-        $baseContent = $this->files->get($baseNavFile);
-
-        if (preg_match('/const\s+sidebarNavItems\s*:\s*NavItem\[\]\s*=\s*\[(.*?)\];/s', $baseContent, $matches)) {
-            $navItemsBlock = $matches[1];
-
-            $templateContent = preg_replace(
-                '/const\s+sidebarNavItems\s*:\s*NavItem\[\]\s*=\s*\[(.*?)\];/s',
-                "const sidebarNavItems: NavItem[] = [{$navItemsBlock}];",
-                $templateContent
+        if (!Str::contains($content, 'import { contentSidebarNavItems }')) {
+            $content = str_replace(
+                "import { cn } from '@/lib/utils';",
+                "import { cn } from '@/lib/utils';\nimport { contentSidebarNavItems } from '@/config/adminNavigation';",
+                $content
             );
         }
 
-        $this->files->put($outputFile, $templateContent);
-        $this->info("Content page file '{$outputFile}' created successfully.");
+        if (!Str::contains($content, 'const [navItems, setNavItems] = useState')) {
+            $content = str_replace(
+                'const pageName = getPageNameFromPath();',
+                "const pageName = getPageNameFromPath();\n    const [navItems, setNavItems] = useState<NavItem[]>(contentSidebarNavItems);",
+                $content
+            );
+
+            if (!Str::contains($content, 'setNavItems(')) {
+                $content = str_replace(
+                    'useEffect(() => {',
+                    "// Set active navigation item based on current path\n    useEffect(() => {\n        setNavItems(contentSidebarNavItems.map(item => ({\n            ...item,\n            isActive: item.href === currentPath\n        })));\n    }, [currentPath]);\n\n    useEffect(() => {",
+                    $content
+                );
+            }
+        }
+
+        if (Str::contains($content, 'sidebarNavItems.map(')) {
+            $content = str_replace(
+                'sidebarNavItems.map(',
+                'navItems.map(',
+                $content
+            );
+        }
+
+        $content = str_replace('const Home = ', "const " . Str::studly($page) . " = ", $content);
+        $content = str_replace('export default Home;', "export default " . Str::studly($page) . ";", $content);
+        $content = preg_replace('/title: \'[^\']*\'/', "title: '{$title}'", $content);
+        $content = preg_replace('/<Head title="[^"]*"/', "<Head title=\"{$title}\"", $content);
+
+        if ($singleField) {
+            preg_match('/<form onSubmit={handleSubmit}.*?<\/form>/s', $content, $formMatches);
+
+            if (!empty($formMatches[0])) {
+                $originalForm = $formMatches[0];
+
+                $simplifiedForm = <<<EOT
+<form onSubmit={handleSubmit} className="space-y-6">
+    <div className="grid gap-2">
+        <label htmlFor="pageContent" className="text-sm font-medium">
+            Page Content
+        </label>
+        <textarea
+            id="pageContent"
+            rows={10}
+            className="p-2 border rounded w-full"
+            value={data.attrs.pageContent || ''}
+            onChange={(e) => setData('attrs', {
+                ...data.attrs,
+                pageContent: e.target.value
+            })}
+        />
+    </div>
+
+    {errors.attrs && (
+        <p className="text-red-500 text-sm">{errors.attrs}</p>
+    )}
+
+    <div className="flex justify-end pt-4">
+        <Button type="submit" disabled={processing}>
+            {processing ? 'Saving...' : 'Save Content'}
+        </Button>
+    </div>
+</form>
+EOT;
+
+                $content = str_replace($originalForm, $simplifiedForm, $content);
+
+                $content = preg_replace(
+                    '/attrs: {.*?},/s',
+                    "attrs: {\n            pageContent: ''\n        },",
+                    $content
+                );
+            }
+        }
+
+        // 3. Write the file
+        $this->files->put($outputFile, $content);
+        $this->info("Created content page file at {$outputFile}");
     }
 }

@@ -19,6 +19,14 @@ const sidebarNavItems: NavItem[] = [
         title: 'Home',
         href: '/pages/home',
     },
+        {
+        title: 'About',
+        href: '/pages/about',
+    },
+        {
+        title: 'Contact',
+        href: '/pages/contact',
+    },
 ];
 const Pages = () => {
     const currentPath = window.location.pathname;
