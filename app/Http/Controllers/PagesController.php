@@ -29,7 +29,6 @@ class PagesController extends Controller
         ]);
     }
 
-
     public function update(Request $request)
     {
         $validated = $request->validate([

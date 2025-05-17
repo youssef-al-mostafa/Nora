@@ -105,14 +105,14 @@ export default function CreateAdmin() {
             }
         } finally {
             setIsSubmitting(false);
-            window.location.href = route('admin.admins');
+            window.location.href = route('admin.all');
         }
     }
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admins" />
             <div className="p-4">
-                <Link href={route('admin.admins')}
+                <Link href={route('admin.all')}
                       className="btn btn-primary h-fit py-1
                       w-fit rounded-lg">
                     <ArrowLeft />

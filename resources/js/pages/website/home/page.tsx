@@ -4,6 +4,7 @@ import { contentService } from '../../../services/ContentSevice';
 import NavBar from '@/components/website/navigation/NavBar';
 import Banner from '@/pages/website/home/Banner';
 import Footer from '@/components/website/navigation/Footer';
+import { CardGrid } from './CardGrid';
 
 export default function Home() {
   const { initialContent } = usePage().props as never;
@@ -19,6 +20,7 @@ export default function Home() {
       <Head title="Home" />
       <NavBar />
       <Banner />
+      <CardGrid />
       <Footer />
     </>
   );

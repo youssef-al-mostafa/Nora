@@ -78,7 +78,7 @@ export const AdminsTable = () => {
         const fetchAdmins = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get('/admin/all', {
+                const response = await axios.get(route('admin.admins'), {
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
                         'Content-Type': 'application/json',

@@ -36,7 +36,7 @@ class UserController extends Controller
         ], 201);
     }
     public function createAdmin(): Response{
-        return Inertia::render('admins/createAdmin');
+        return Inertia::render('admins/CreateAdmin');
     }
     public function getAdmins(): JsonResponse{
         $admins = User::role('admin')->get(['id', 'name', 'email', 'email_verified_at', 'created_at', 'updated_at']);
